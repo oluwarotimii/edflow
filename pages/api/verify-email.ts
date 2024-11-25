@@ -1,4 +1,4 @@
-// pages/api/auth/verify-email.ts
+// pages/api/verify-email.ts
 import { auth } from '@/lib/firebase';
 import { db } from '@/lib/firebase';
 

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Header } from '@/components/header'
-import { SchoolProfilePage } from '@/components/school-profile-form'
+import { SchoolProfileForm } from '@/components/school-profile-form'
 import { PlanDetails } from '@/components/plan-details'
 import { SchoolStats } from '@/components/school-stats'
 import { LoadingScreen } from '@/components/ui/loading-screen'
@@ -42,8 +42,8 @@ export default function DashboardPage() {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const userId = user.uid;
-
         try {
+          setLoading(true); // Set loading to true while fetching data
           const userRef = doc(db, 'users', userId);
           const userSnap = await getDoc(userRef);
 
@@ -52,7 +52,6 @@ export default function DashboardPage() {
             setSchoolProfile(userData.schoolProfile || {}); // Load school profile
             setPlanDetails(userData.planDetails || {}); // Load plan details
             setSubscribed(userData.subscribed || false); // Check if subscribed
-            setLoading(false); // Finished loading
           } else {
             console.error('User document does not exist');
             router.push('/school-profile'); // Redirect to profile setup if no profile
@@ -60,6 +59,8 @@ export default function DashboardPage() {
         } catch (error) {
           console.error('Error fetching user data:', error);
           router.push('/login'); // Redirect to login if there's an error fetching data
+        } finally {
+          setLoading(false); // Hide loading state after data is fetched
         }
       } else {
         router.push('/login'); // Redirect to login if no user is authenticated
@@ -70,14 +71,12 @@ export default function DashboardPage() {
   }, [auth, router]);
 
   if (loading) {
-    return <LoadingScreen />;
+    return <LoadingScreen />; // Display loading screen while fetching data
   }
 
-  // Function to handle profile update
   const handleProfileUpdate = async (updatedProfile) => {
     try {
       const userId = auth.currentUser?.uid;
-
       if (!userId) throw new Error('User not authenticated');
 
       const userRef = doc(db, 'users', userId);
@@ -91,20 +90,15 @@ export default function DashboardPage() {
     }
   };
 
-  // Function to handle plan selection
   const handlePlanSelection = async (selectedPlan) => {
     try {
       const userId = auth.currentUser?.uid;
-
       if (!userId) throw new Error('User not authenticated');
 
       const userRef = doc(db, 'users', userId);
       await setDoc(
         userRef,
-        {
-          subscribed: true,
-          planDetails: selectedPlan, // Save selected plan
-        },
+        { subscribed: true, planDetails: selectedPlan },
         { merge: true }
       );
 
@@ -116,6 +110,8 @@ export default function DashboardPage() {
       alert('Failed to update plan. Please try again.');
     }
   };
+
+
   return (
     <div className="min-h-screen bg-gray-100">
       <Header />
@@ -134,7 +130,7 @@ export default function DashboardPage() {
                 <CardDescription>View and update your school's information</CardDescription>
               </CardHeader>
               <CardContent>
-                <SchoolProfilePage initialData={schoolProfile} onSubmit={handleProfileUpdate} />
+                <SchoolProfileForm initialData={schoolProfile} onSubmit={handleProfileUpdate} />
               </CardContent>
             </Card>
           </TabsContent>

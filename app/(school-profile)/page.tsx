@@ -1,3 +1,5 @@
+//school profile.tsx
+
 'use client'
 
 import { useState } from 'react'
@@ -55,62 +57,75 @@ export default function SchoolProfilePage() {
   }
 
   
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-  
-    try {
-      const auth = getAuth();
-      const user = auth.currentUser;
-  
-      if (!user) {
-        throw new Error('User is not authenticated');
-      }
-  
-      const idToken = await user.getIdToken();
-  
-      // Check if formData has all required fields
-      if (!formData.schoolName || !formData.abbreviation || !formData.adminName || !formData.email || !formData.phoneNumber || !formData.address || !formData.city || !formData.state || !formData.country || !formData.gender || !formData.studentCount || !formData.establishedYear) {
-        throw new Error('Please fill all required fields.');
-      }
-  
-      // If schoolType is required, make sure it's selected
-      if (!formData.schoolType) {
-        throw new Error('Please select a school type.');
-      }
-  
-      console.log('Form Data:', formData);  // Log the form data to verify it's correct
-      
-  
-      const res = await fetch('/api/profile', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`,
-        },
-        body: JSON.stringify(formData),
-      });
-  
-      // Log the raw response to check if it contains HTML instead of JSON
-      const textResponse = await res.text();  // Get response as text first
-  
-      console.log('Response text:', textResponse);  // Log the raw response
-  
-      if (!res.ok) {
-        const errorData = JSON.parse(textResponse);  // Try parsing if the response is valid JSON
-        throw new Error(errorData.message || 'Error occurred while saving the profile');
-      }
-  
-      alert('School profile saved successfully!');
-      router.push('/plan-selection');
-    } catch (error) {
-      console.error('Error saving school profile:', error);
-      alert('Failed to save school profile. Please try again later.');
-    } finally {
-      setLoading(false);
+ 
+
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
+
+  try {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+      throw new Error('User is not authenticated');
     }
-  };
-  
+
+    const idToken = await user.getIdToken();
+
+    // Check if formData has all required fields
+    if (
+      !formData.schoolName ||
+      !formData.abbreviation ||
+      !formData.adminName ||
+      !formData.email ||
+      !formData.phoneNumber ||
+      !formData.address ||
+      !formData.city ||
+      !formData.state ||
+      !formData.country ||
+      !formData.gender ||
+      !formData.studentCount ||
+      !formData.establishedYear
+    ) {
+      throw new Error('Please fill all required fields.');
+    }
+
+    // If schoolType is required, make sure it's selected
+    if (!formData.schoolType) {
+      throw new Error('Please select a school type.');
+    }
+
+    console.log('Form Data:', formData);  // Log the form data to verify it's correct
+
+    const res = await fetch('/api/profile', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}`,
+      },
+      body: JSON.stringify(formData),
+    });
+
+    // Parse the response directly as JSON
+    const data = await res.json();
+
+    if (!res.ok) {
+      // If the response is not ok, throw an error with the message from the API
+      throw new Error(data.message || 'Error occurred while saving the profile');
+    }
+
+    // If successful, alert and navigate to the next page
+    alert('School profile saved successfully!');
+    router.push('/plan-selection');
+  } catch (error) {
+    console.error('Error saving school profile:', error);
+    alert(error.message || 'Failed to save school profile. Please try again later.');
+  } finally {
+    setLoading(false);
+  }
+};
+
   
   
 

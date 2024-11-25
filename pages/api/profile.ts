@@ -1,3 +1,4 @@
+// api/profile.ts
 import { admin } from '@/lib/firebase-admin'; // Import admin SDK initialization
 
 export default async function handler(req, res) {
@@ -6,8 +7,8 @@ export default async function handler(req, res) {
       const profileData = req.body;
 
       // Validate that the required data is present
-      if (!profileData || !profileData.abbreviation) {
-        return res.status(400).json({ message: 'Abbreviation and profile data are required' });
+      if (!profileData || !profileData.abbreviation || !profileData.name || !profileData.address) {
+        return res.status(400).json({ message: 'Abbreviation, name, and address are required' });
       }
 
       // Get the Firebase ID token from the Authorization header
@@ -27,16 +28,23 @@ export default async function handler(req, res) {
       profileData.schoolId = generateSchoolId(profileData.abbreviation);
 
       // Create the document reference using the correct Firestore method
-      const schoolDocRef = admin.firestore().doc('schools/' + profileData.schoolId); // Use admin.firestore()
+      const schoolDocRef = admin.firestore().doc('schools/' + profileData.schoolId);
 
       // Save the profile data to Firestore
-      await schoolDocRef.set(profileData);
+      await schoolDocRef.set({
+        ...profileData,
+        adminUserId: userId, // Link the admin user ID to the school
+        createdAt: admin.firestore.FieldValue.serverTimestamp(), // Add timestamp for when the school was created
+      });
 
       // Return success response
       res.status(201).json({ message: 'School profile created successfully', schoolId: profileData.schoolId });
     } catch (error) {
       console.error('Error creating school profile:', error);
-      return res.status(500).json({ message: `Error creating school profile: ${error.message}` });
+      
+      // Provide a more detailed error message
+      const errorMessage = error.code ? `Firebase Error: ${error.message}` : `Error: ${error.message}`;
+      return res.status(500).json({ message: errorMessage });
     }
   } else {
     res.status(405).json({ message: 'Method Not Allowed' });
@@ -46,5 +54,5 @@ export default async function handler(req, res) {
 // Helper function to generate school ID from abbreviation
 function generateSchoolId(abbreviation: string): string {
   const randomNumber = Math.floor(Math.random() * 999) + 1; // Generate random number between 1 and 999
-  return `${abbreviation}${randomNumber.toString().padStart(3, '0')}`; // Format it to be at least 3 digits
+  return `${abbreviation.toUpperCase()}${randomNumber.toString().padStart(3, '0')}`; // Ensure abbreviation is uppercase
 }

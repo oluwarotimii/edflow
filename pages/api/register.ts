@@ -2,8 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { auth } from '@/lib/firebase';
 import { db } from '@/lib/firebase';
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
-import {doc, setDoc} from 'firebase/firestore';
-
+import { doc, setDoc } from 'firebase/firestore';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -13,23 +12,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const { email, password } = req.body;
 
+    // Input validation
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required.' });
+    }
+
     // Create a new user with email and password
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
     // Send email verification to the user
     await sendEmailVerification(userCredential.user);
-    
-  // Store the user information in Firestore under the 'users' collection
-  const userRef = doc(db, 'users', userCredential.user.uid); // Referencing the user's document by UID
 
-  // Save user data in Firestore (e.g., email and verification status)
-  await setDoc(userRef, {
-    email: email,
-    isEmailVerified: false,  // Email is not verified initially
-  });
+    // Store the user information in Firestore under the 'users' collection
+    const userRef = doc(db, 'users', userCredential.user.uid);
 
+    // Save user data in Firestore (e.g., email, role, etc.)
+    await setDoc(userRef, {
+      email: email,
+      isEmailVerified: false, // Email is not verified initially
+      role: 'admin',          // Default role
+      schoolId: null,         // School will be linked during onboarding
+      profileCompleted: false, // Tracks if onboarding is complete
+      createdAt: new Date(),   // Timestamp for user creation
+    });
 
-    // Return the user UID (you can also return a success message or token)
+    // Return success response
     res.status(200).json({
       message: 'User created successfully. Please verify your email.',
       userId: userCredential.user.uid,

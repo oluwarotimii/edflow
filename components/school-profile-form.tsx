@@ -15,7 +15,7 @@ import { getAuth } from 'firebase/auth'
 import { getDoc, doc, setDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 
-export  function SchoolProfilePage() {
+export function SchoolProfileForm() {
   const [formData, setFormData] = useState({
     schoolName: '',
     abbreviation: '',
@@ -35,335 +35,344 @@ export  function SchoolProfilePage() {
     website: '',
     description: '',
   })
-  const [loading, setLoading] = useState(false);
-  const [fetching, setFetching] = useState(true); // To manage data loading state
-  const router = useRouter();
+  const [loading, setLoading] = useState(false)
+  const [fetching, setFetching] = useState(true)
+  const [isEditing, setIsEditing] = useState(false)
+  const [hasExistingData, setHasExistingData] = useState(false)
+  const router = useRouter()
 
-  // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
 
-  // Handle select changes
   const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
 
-  // Handle checkbox changes
   const handleCheckboxChange = (facility: string, checked: boolean) => {
     setFormData((prev) => ({
       ...prev,
       facilities: checked
         ? [...prev.facilities, facility]
         : prev.facilities.filter((f) => f !== facility),
-    }));
-  };
+    }))
+  }
 
-  // Fetch user data from Firestore
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const auth = getAuth();
-        const user = auth.currentUser;
+        const auth = getAuth()
+        const user = auth.currentUser
 
         if (user) {
-          const userRef = doc(db, 'users', user.uid); // Adjust collection name if different
-          const userSnap = await getDoc(userRef);
+          const userRef = doc(db, 'users', user.uid)
+          const userSnap = await getDoc(userRef)
 
           if (userSnap.exists()) {
-            const userData = userSnap.data();
+            const userData = userSnap.data()
             if (userData.schoolProfile) {
-              // Populate formData with saved data
-              setFormData(userData.schoolProfile);
+              setFormData(userData.schoolProfile)
+              setHasExistingData(true)
             }
           } else {
-            console.log('User data not found');
+            console.log('User data not found')
           }
         } else {
-          console.log('No authenticated user');
-          router.push('/login'); // Redirect if not logged in
+          console.log('No authenticated user')
+          router.push('/login')
         }
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error('Error fetching user data:', error)
       } finally {
-        setFetching(false); // Stop fetching state
+        setFetching(false)
       }
-    };
+    }
 
-    fetchUserData();
-  }, [router]);
+    fetchUserData()
+  }, [router])
 
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+    e.preventDefault()
+    setLoading(true)
 
     try {
-      const res = await fetch('/api/profile', {
-        method: 'POST', // Change to 'PUT' for updates
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      const auth = getAuth()
+      const user = auth.currentUser
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'An error occurred');
+      if (!user) {
+        throw new Error('No authenticated user')
       }
 
-      alert('School profile saved successfully!');
-      router.push('/plan-selection'); // Redirect to the next step
+      const userRef = doc(db, 'users', user.uid)
+      await setDoc(userRef, { schoolProfile: formData }, { merge: true })
+
+      alert('School profile saved successfully!')
+      setHasExistingData(true)
+      setIsEditing(false)
     } catch (error) {
-      console.error('Error saving school profile:', error);
-      alert('Failed to save school profile. Please try again.');
+      console.error('Error saving school profile:', error)
+      alert('Failed to save school profile. Please try again.')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   if (fetching) {
-    return <div>Loading...</div>; // Show a loader while fetching data
+    return <div>Loading...</div>
   }
-  
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center p-4 bg-gradient-to-b from-blue-50 to-white">
-      <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle className="text-3xl font-bold text-center">School Profile</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="schoolName">School Name</Label>
-                <Input
-                  id="schoolName"
-                  name="schoolName"
-                  value={formData.schoolName}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="abbreviation">Abbreviation</Label>
-                <Input
-                  id="abbreviation"
-                  name="abbreviation"
-                  value={formData.abbreviation}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="adminName">Admin Name</Label>
-                <Input
-                  id="adminName"
-                  name="adminName"
-                  value={formData.adminName}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="phoneNumber">Phone Number</Label>
-                <Input
-                  id="phoneNumber"
-                  name="phoneNumber"
-                  type="tel"
-                  value={formData.phoneNumber}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-            </div>
+    <Card className="w-full max-w-2xl">
+      <CardHeader>
+        <CardTitle className="text-3xl font-bold text-center">School Profile</CardTitle>
+        {hasExistingData && !isEditing && (
+          <Button onClick={() => setIsEditing(true)} className="ml-auto">
+            Edit Profile
+          </Button>
+        )}
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="address">Address</Label>
-              <Textarea
-                id="address"
-                name="address"
-                value={formData.address}
+              <Label htmlFor="schoolName">School Name</Label>
+              <Input
+                id="schoolName"
+                name="schoolName"
+                value={formData.schoolName}
                 onChange={handleInputChange}
                 required
+                disabled={hasExistingData && !isEditing}
               />
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div>
-                <Label htmlFor="city">City</Label>
-                <Input
-                  id="city"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="state">State</Label>
-                <Input
-                  id="state"
-                  name="state"
-                  value={formData.state}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="country">Country</Label>
-                <Input
-                  id="country"
-                  name="country"
-                  value={formData.country}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="schoolType">School Type</Label>
-                <Select name="schoolType" value={formData.schoolType} onValueChange={(value) => handleSelectChange('schoolType', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="primary">Primary</SelectItem>
-                    <SelectItem value="secondary">Secondary</SelectItem>
-                    <SelectItem value="higher">Higher Education</SelectItem>
-                    <SelectItem value="vocational">Vocational</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
             <div>
-              <Label>Gender</Label>
-              <RadioGroup
-                name="gender"
-                value={formData.gender}
-                onValueChange={(value) => handleSelectChange('gender', value)}
-                className="flex space-x-4"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="boys" id="boys" />
-                  <Label htmlFor="boys">Boys</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="girls" id="girls" />
-                  <Label htmlFor="girls">Girls</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="mixed" id="mixed" />
-                  <Label htmlFor="mixed">Mixed</Label>
-                </div>
-              </RadioGroup>
-            </div>
-            <div>
-              <Label>Boarding Facilities</Label>
-              <RadioGroup
-                name="boardingFacilities"
-                value={formData.boardingFacilities}
-                onValueChange={(value) => handleSelectChange('boardingFacilities', value)}
-                className="flex space-x-4"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="day" id="day" />
-                  <Label htmlFor="day">Day School</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="boarding" id="boarding" />
-                  <Label htmlFor="boarding">Boarding School</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="both" id="both" />
-                  <Label htmlFor="both">Both</Label>
-                </div>
-              </RadioGroup>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="studentCount">Number of Students</Label>
-                <Input
-                  id="studentCount"
-                  name="studentCount"
-                  type="number"
-                  value={formData.studentCount}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="establishedYear">Year Established</Label>
-                <Input
-                  id="establishedYear"
-                  name="establishedYear"
-                  type="number"
-                  value={formData.establishedYear}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="website">School Website</Label>
+              <Label htmlFor="abbreviation">Abbreviation</Label>
               <Input
-                id="website"
-                name="website"
-                type="url"
-                value={formData.website}
+                id="abbreviation"
+                name="abbreviation"
+                value={formData.abbreviation}
                 onChange={handleInputChange}
-                placeholder="https://www.yourschool.com"
+                required
+                disabled={hasExistingData && !isEditing}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+                disabled={hasExistingData && !isEditing}
               />
             </div>
             <div>
-              <Label htmlFor="description">School Description</Label>
-              <Textarea
-                id="description"
-                name="description"
-                value={formData.description}
+              <Label htmlFor="phoneNumber">Phone Number</Label>
+              <Input
+                id="phoneNumber"
+                name="phoneNumber"
+                type="tel"
+                value={formData.phoneNumber}
                 onChange={handleInputChange}
-                placeholder="Tell us about your school..."
+                required
+                disabled={hasExistingData && !isEditing}
+              />
+            </div>
+          </div>
+          <div>
+            <Label htmlFor="address">Address</Label>
+            <Textarea
+              id="address"
+              name="address"
+              value={formData.address}
+              onChange={handleInputChange}
+              required
+              disabled={hasExistingData && !isEditing}
+            />
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <Label htmlFor="city">City</Label>
+              <Input
+                id="city"
+                name="city"
+                value={formData.city}
+                onChange={handleInputChange}
+                required
+                disabled={hasExistingData && !isEditing}
               />
             </div>
             <div>
-              <Label>Facilities</Label>
-              <div className="grid grid-cols-2 gap-2 mt-2">
-                {['Library', 'Computer Lab', 'Science Lab', 'Sports Field', 'Cafeteria', 'Auditorium'].map((facility) => (
-                  <div key={facility} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={facility.toLowerCase().replace(' ', '-')}
-                      checked={formData.facilities.includes(facility)}
-                      onCheckedChange={(checked) => handleCheckboxChange(facility, checked as boolean)}
-                    />
-                    <label
-                      htmlFor={facility.toLowerCase().replace(' ', '-')}
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      {facility}
-                    </label>
-                  </div>
-                ))}
+              <Label htmlFor="state">State</Label>
+              <Input
+                id="state"
+                name="state"
+                value={formData.state}
+                onChange={handleInputChange}
+                required
+                disabled={hasExistingData && !isEditing}
+              />
+            </div>
+            <div>
+              <Label htmlFor="country">Country</Label>
+              <Input
+                id="country"
+                name="country"
+                value={formData.country}
+                onChange={handleInputChange}
+                required
+                disabled={hasExistingData && !isEditing}
+              />
+            </div>
+            <div>
+              <Label htmlFor="schoolType">School Type</Label>
+              <Select
+                name="schoolType"
+                value={formData.schoolType}
+                onValueChange={(value) => handleSelectChange('schoolType', value)}
+                disabled={hasExistingData && !isEditing}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="primary">Primary</SelectItem>
+                  <SelectItem value="secondary">Secondary</SelectItem>
+                  <SelectItem value="higher">Higher Education</SelectItem>
+                  <SelectItem value="vocational">Vocational</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div>
+            <Label>Gender</Label>
+            <RadioGroup
+              name="gender"
+              value={formData.gender}
+              onValueChange={(value) => handleSelectChange('gender', value)}
+              className="flex space-x-4"
+              disabled={hasExistingData && !isEditing}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="boys" id="boys" />
+                <Label htmlFor="boys">Boys</Label>
               </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="girls" id="girls" />
+                <Label htmlFor="girls">Girls</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="mixed" id="mixed" />
+                <Label htmlFor="mixed">Mixed</Label>
+              </div>
+            </RadioGroup>
+          </div>
+          <div>
+            <Label>Boarding Facilities</Label>
+            <RadioGroup
+              name="boardingFacilities"
+              value={formData.boardingFacilities}
+              onValueChange={(value) => handleSelectChange('boardingFacilities', value)}
+              className="flex space-x-4"
+              disabled={hasExistingData && !isEditing}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="day" id="day" />
+                <Label htmlFor="day">Day School</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="boarding" id="boarding" />
+                <Label htmlFor="boarding">Boarding School</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="both" id="both" />
+                <Label htmlFor="both">Both</Label>
+              </div>
+            </RadioGroup>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="studentCount">Number of Students</Label>
+              <Input
+                id="studentCount"
+                name="studentCount"
+                type="number"
+                value={formData.studentCount}
+                onChange={handleInputChange}
+                required
+                disabled={hasExistingData && !isEditing}
+              />
             </div>
+            <div>
+              <Label htmlFor="establishedYear">Year Established</Label>
+              <Input
+                id="establishedYear"
+                name="establishedYear"
+                type="number"
+                value={formData.establishedYear}
+                onChange={handleInputChange}
+                required
+                disabled={hasExistingData && !isEditing}
+              />
+            </div>
+          </div>
+          <div>
+            <Label htmlFor="website">School Website</Label>
+            <Input
+              id="website"
+              name="website"
+              type="url"
+              value={formData.website}
+              onChange={handleInputChange}
+              placeholder="https://www.yourschool.com"
+              disabled={hasExistingData && !isEditing}
+            />
+          </div>
+          <div>
+            <Label htmlFor="description">School Description</Label>
+            <Textarea
+              id="description"
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              placeholder="Tell us about your school..."
+              disabled={hasExistingData && !isEditing}
+            />
+          </div>
+          <div>
+            <Label>Facilities</Label>
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              {['Library', 'Computer Lab', 'Science Lab', 'Sports Field', 'Cafeteria', 'Auditorium'].map((facility) => (
+                <div key={facility} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={facility.toLowerCase().replace(' ', '-')}
+                    checked={formData.facilities.includes(facility)}
+                    onCheckedChange={(checked) => handleCheckboxChange(facility, checked as boolean)}
+                    disabled={hasExistingData && !isEditing}
+                  />
+                  <label
+                    htmlFor={facility.toLowerCase().replace(' ', '-')}
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    {facility}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+          {(!hasExistingData || isEditing) && (
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? <LoadingSpinner /> : 'Save and Continue'}
+              {loading ? <LoadingSpinner /> : (hasExistingData ? 'Save Changes' : 'Save Profile')}
             </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+          )}
+        </form>
+      </CardContent>
+    </Card>
   )
 }
 

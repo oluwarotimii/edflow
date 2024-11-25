@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { signInWithEmailAndPassword, setPersistence, browserSessionPersistence } from 'firebase/auth';
+import { signInWithEmailAndPassword, setPersistence, browserSessionPersistence, browserLocalPersistence } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { getAuth, signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { LoadingScreen } from '@/components/ui/loading-screen'
@@ -67,46 +68,42 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');  // Clear any previous error messages
-    setLoading(true);  // Show loading spinner or disable form elements
-  
-    console.log('Login attempt:', { email });
-  
+    setError(''); // Clear previous errors
+    setLoading(true); // Show loading state
+    
     try {
       // Step 1: Set the persistence to browser session or local persistence
-      await setPersistence(auth, browserSessionPersistence);  // You can use browserSessionPersistence or localPersistence
-  
+      await setPersistence(auth, browserLocalPersistence); // or use localPersistence if needed
+      
       console.log('Attempting to sign in with email:', email);
-  
+      
       // Step 2: Sign in the user with email and password
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-  
+      
       console.log('User signed in successfully:', userCredential.user.uid);
-  
-      // Step 3: Redirect or proceed with the logged-in user
-      router.push('/dashboard');  // Assuming you have a dashboard page or any other post-login flow
-  
+      
+      // Step 3: Redirect to the dashboard
+      router.push('/dashboard');
     } catch (error) {
       console.error('Error during login process:', error);
-  
-      // Step 4: Handle different error cases
+      
+      // Step 4: Handle different error cases with user-friendly messages
       if (error.code === 'auth/user-not-found') {
-        setError('No user found with this email.');
+        setError('No user found with this email address.');
       } else if (error.code === 'auth/wrong-password') {
         setError('Incorrect password. Please try again.');
       } else if (error.code === 'auth/invalid-email') {
-        setError('Invalid email format. Please check your email address.');
+        setError('Please enter a valid email address.');
       } else {
-        setError('An unexpected error occurred during login. Please try again later.');
+        setError('Something went wrong. Please try again later.');
       }
-  
     } finally {
-      console.log('Login process finished.');
-      setLoading(false);  // Hide loading spinner or re-enable form elements
+      setLoading(false); // Hide loading state
     }
   };
   
-  
+
+
   
   
   
