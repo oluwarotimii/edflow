@@ -120,7 +120,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     router.push('/plan-selection');
   } catch (error) {
     console.error('Error saving school profile:', error);
-    alert(error.message || 'Failed to save school profile. Please try again later.');
+    alert((error as Error).message || 'Failed to save school profile. Please try again later.');
   } finally {
     setLoading(false);
   }
