@@ -14,6 +14,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState('overview')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     schoolName: '',
