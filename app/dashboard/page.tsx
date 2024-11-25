@@ -209,7 +209,7 @@ export default function DashboardPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>School Profile</CardTitle>
-                  <CardDescription>View and update your school's information</CardDescription>
+                  <CardDescription>View and update your school&apos;s information</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <SchoolProfileForm initialData={schoolProfile} onSubmit={handleProfileUpdate} />
@@ -235,7 +235,7 @@ export default function DashboardPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>School Statistics</CardTitle>
-                  <CardDescription>Overview of your school's key metrics</CardDescription>
+                  <CardDescription>Overview of your school&apos;s key metrics</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <SchoolStats />
