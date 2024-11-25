@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -15,14 +16,35 @@ import { getAuth } from 'firebase/auth'
 import { getDoc, doc, setDoc, updateDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 
-export function SchoolProfileForm() {
+interface SchoolProfileFormProps {
+  initialData: {
+    schoolName: string;
+    address: string;
+    email: string;
+    phoneNumber: string;
+    logoUrl: string;
+  };
+  onSubmit: (updatedProfile: {
+    schoolName: string;
+    address: string;
+    email: string;
+    phoneNumber: string;
+    logoUrl: string;
+  }) => Promise<void>;
+}
+
+export const SchoolProfileForm: React.FC<SchoolProfileFormProps> = ({
+  initialData,
+  onSubmit,
+}) => {
   const [formData, setFormData] = useState({
-    schoolName: '',
+    schoolName: initialData.schoolName || '',
+    address: initialData.address || '',
+    email: initialData.email || '',
+    phoneNumber: initialData.phoneNumber || '',
+    logoUrl: initialData.logoUrl || '',
     abbreviation: '',
     adminName: '',
-    email: '',
-    phoneNumber: '',
-    address: '',
     city: '',
     state: '',
     country: '',
@@ -34,7 +56,7 @@ export function SchoolProfileForm() {
     facilities: [] as string[],
     website: '',
     description: '',
-  })
+  });
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
