@@ -12,7 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getAuth } from 'firebase/auth'
-import { getDoc, doc, setDoc } from 'firebase/firestore'
+import { getDoc, doc, setDoc, updateDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 
 export function SchoolProfileForm() {
@@ -104,8 +104,27 @@ export function SchoolProfileForm() {
         throw new Error('No authenticated user')
       }
 
+      // Generate a unique schoolCode (or schoolId)
+      const schoolCode = generateSchoolCode(formData.abbreviation)
+
+      // Prepare the school data
+      const schoolData = {
+        ...formData,
+        schoolCode,
+        adminId: user.uid,
+        createdAt: new Date(),
+      }
+
+      // Save the school data in the `schools` collection
+      const schoolRef = doc(db, 'schools', schoolCode)
+      await setDoc(schoolRef, schoolData)
+
+      // Update the user's document with the schoolCode
       const userRef = doc(db, 'users', user.uid)
-      await setDoc(userRef, { schoolProfile: formData }, { merge: true })
+      await updateDoc(userRef, { 
+        schoolCode,
+        schoolProfile: formData // Save the school profile in the user document as well
+      })
 
       alert('School profile saved successfully!')
       setHasExistingData(true)
@@ -118,9 +137,16 @@ export function SchoolProfileForm() {
     }
   }
 
+  // Helper function to generate schoolCode
+  function generateSchoolCode(abbreviation: string): string {
+    const randomNumber = Math.floor(Math.random() * 999) + 1
+    return `${abbreviation.toUpperCase()}${randomNumber.toString().padStart(3, '0')}`
+  }
+
   if (fetching) {
     return <div>Loading...</div>
   }
+
 
   return (
     <Card className="w-full max-w-2xl">

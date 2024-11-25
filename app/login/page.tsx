@@ -73,8 +73,7 @@ export default function LoginPage() {
     
     try {
       // Step 1: Set the persistence to browser session or local persistence
-      await setPersistence(auth, browserLocalPersistence); // or use localPersistence if needed
-      
+      await setPersistence(auth, browserLocalPersistence); 
       console.log('Attempting to sign in with email:', email);
       
       // Step 2: Sign in the user with email and password

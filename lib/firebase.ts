@@ -41,4 +41,5 @@ function initializeFirebase() {
 // Ensure Firebase is initialized
 initializeFirebase();
 
+// Export auth and db
 export { auth, db };
