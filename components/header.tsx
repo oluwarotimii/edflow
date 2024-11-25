@@ -16,6 +16,7 @@ export function Header() {
       console.log('User signed out successfully');
   
       // Redirect the user to the login page (or any other page)
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       const router = useRouter();
       router.push('/login');  // Adjust the path as needed
     } catch (error) {

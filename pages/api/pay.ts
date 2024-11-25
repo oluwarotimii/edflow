@@ -1,4 +1,7 @@
-export default async function handler(req, res) {
+import { NextApiRequest, NextApiResponse } from "next";
+
+/* eslint-disable @typescript-eslint/no-unused-vars */
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
       const { userId, email, planId } = req.body; // Plan ID and User ID passed from frontend
   

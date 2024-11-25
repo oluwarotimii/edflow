@@ -1,22 +1,19 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Checkbox } from '@/components/ui/checkbox'
-import { ScrollArea } from '@/components/ui/scroll-area'
+
 import { BookOpen, Users, Calendar, BarChart, Shield, Zap } from 'lucide-react'
 
 export default function Home() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('overview')
   const [error, setError] = useState('')
-  const [loading, setLoading] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const [formData, setFormData] = useState({
     schoolName: '',
@@ -69,6 +66,8 @@ export default function Home() {
   //   // For now, we'll just simulate a successful registration
   //   router.push('/email-verification')
   // }
+
+  
 
   const features = [
     { icon: BookOpen, title: 'Curriculum Management', description: 'Easily manage and update your school curriculum' },

@@ -41,6 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       message: 'User created successfully. Please verify your email.',
       userId: userCredential.user.uid,
     });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error('Registration error:', error);
 

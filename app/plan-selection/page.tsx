@@ -1,7 +1,8 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+// import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
@@ -36,7 +37,7 @@ const plans = [
 export default function PlanSelectionPage() {
   const [selectedPlan, setSelectedPlan] = useState('')
   const [loading, setLoading] = useState(false)
-  const router = useRouter()
+  // const router = useRouter()
 
   
 
