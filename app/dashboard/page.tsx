@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, SetStateAction } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
@@ -92,7 +92,7 @@ export default function DashboardPage() {
     return <LoadingScreen />
   }
 
-  const handleProfileUpdate = async (updatedProfile) => {
+  const handleProfileUpdate = async (updatedProfile: SetStateAction<{ schoolName: string; address: string; email: string; phoneNumber: string; logoUrl: string }>) => {
     try {
       const userId = auth.currentUser?.uid
       if (!userId) throw new Error('User not authenticated')
@@ -108,7 +108,7 @@ export default function DashboardPage() {
     }
   }
 
-  const handlePlanSelection = async (selectedPlan) => {
+  const handlePlanSelection = async (selectedPlan: SetStateAction<{ name: string; price: string; features: never[] }>) => {
     try {
       const userId = auth.currentUser?.uid
       if (!userId) throw new Error('User not authenticated')
