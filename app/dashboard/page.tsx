@@ -161,7 +161,7 @@ export default function DashboardPage() {
 
       {/* Main content */}
       <div className="flex-grow">
-        <Header className="hidden md:block" />
+        <Header  />
         <main className="container mx-auto py-6 px-4">
           <div className="flex flex-col md:flex-row items-center justify-between mb-6">
             <div className="mb-4 md:mb-0">
