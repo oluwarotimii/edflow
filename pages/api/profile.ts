@@ -1,7 +1,8 @@
 // api/profile.ts
 import { admin } from '@/lib/firebase-admin'; // Import admin SDK initialization
+import { NextApiRequest, NextApiResponse } from 'next';
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     try {
       const profileData = req.body;
@@ -40,11 +41,22 @@ export default async function handler(req, res) {
       // Return success response
       res.status(201).json({ message: 'School profile created successfully', schoolId: profileData.schoolId });
     } catch (error) {
-      console.error('Error creating school profile:', error);
-      
-      // Provide a more detailed error message
-      const errorMessage = error.code ? `Firebase Error: ${error.message}` : `Error: ${error.message}`;
-      return res.status(500).json({ message: errorMessage });
+      // Properly handle errors with more detailed checks
+      if (error instanceof Error) {
+        console.error('Error creating school profile:', error.message);
+
+        // If the error has a `code` property (specific to Firebase or other custom errors), use it
+        if ('code' in error) {
+          return res.status(500).json({ message: `Firebase Error: ${error.message}` });
+        } else {
+          // If it's a standard Error object, use its message
+          return res.status(500).json({ message: `Error: ${error.message}` });
+        }
+      } else {
+        // Handle unknown error type gracefully
+        console.error('Unknown error occurred during profile creation');
+        return res.status(500).json({ message: 'An unknown error occurred' });
+      }
     }
   } else {
     res.status(405).json({ message: 'Method Not Allowed' });
