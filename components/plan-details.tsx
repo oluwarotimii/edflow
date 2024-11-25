@@ -110,12 +110,12 @@ export function PlanDetails() {
 
       const { paymentUrl } = await response.json();
 
-    if (response.ok) {
-      // Open the Paystack payment URL in a new tab
-      window.open(paymentUrl, '_blank');
-    } else {
-      setError('Failed to initiate payment');
-    }
+      if (response.ok) {
+        // Open the Paystack payment URL in a new tab
+        window.open(paymentUrl, '_blank');
+      } else {
+        setError('Failed to initiate payment');
+      }
     } catch (error) {
       console.error('Error handling subscription:', error);
       alert('An error occurred while processing your subscription. Please try again.');

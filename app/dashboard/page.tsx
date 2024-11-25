@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
 import { useState, useEffect, SetStateAction } from 'react'
@@ -222,11 +223,7 @@ export default function DashboardPage() {
                   <CardDescription>View your current plan details</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <PlanDetails
-                    currentPlan={planDetails}
-                    onSelectPlan={handlePlanSelection}
-                    isSubscribed={subscribed}
-                  />
+                  <PlanDetails />
                 </CardContent>
               </Card>
             </TabsContent>

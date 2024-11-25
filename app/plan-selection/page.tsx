@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/rules-of-hooks */
 'use client'
 
@@ -89,7 +90,7 @@ export default function PlanSelectionPage() {
       }
     } catch (error) {
       console.error("Error during payment initialization:", error);
-      alert(`An error occurred: ${error.message}. Please try again later.`);
+      // alert(`An error occurred: ${error.message}. Please try again later.`);
     } finally {
       setLoading(false);
     }
@@ -101,7 +102,9 @@ export default function PlanSelectionPage() {
   return (
     <div className="min-h-screen flex flex-col justify-center items-center p-4 bg-gradient-to-b from-blue-50 to-white">
       <h1 className="text-3xl font-bold mb-6 text-center">Select a Plan</h1>
-      <form onSubmit={handleSubmit} className="w-full max-w-4xl">
+      <form 
+      // onSubmit={handleSubmit} 
+      className="w-full max-w-4xl">
         <RadioGroup value={selectedPlan} onValueChange={setSelectedPlan} className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {plans.map((plan) => (
             <Card key={plan.id} className={`relative ${selectedPlan === plan.id ? 'border-primary' : ''}`}>

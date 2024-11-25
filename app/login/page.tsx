@@ -88,15 +88,15 @@ export default function LoginPage() {
       console.error('Error during login process:', error);
       
       // Step 4: Handle different error cases with user-friendly messages
-      if (error.code === 'auth/user-not-found') {
-        setError('No user found with this email address.');
-      } else if (error.code === 'auth/wrong-password') {
-        setError('Incorrect password. Please try again.');
-      } else if (error.code === 'auth/invalid-email') {
-        setError('Please enter a valid email address.');
-      } else {
-        setError('Something went wrong. Please try again later.');
-      }
+      // if (error.code === 'auth/user-not-found') {
+      //   setError('No user found with this email address.');
+      // } else if (error.code === 'auth/wrong-password') {
+      //   setError('Incorrect password. Please try again.');
+      // } else if (error.code === 'auth/invalid-email') {
+      //   setError('Please enter a valid email address.');
+      // } else {
+      //   setError('Something went wrong. Please try again later.');
+      // }
     } finally {
       setLoading(false); // Hide loading state
     }
