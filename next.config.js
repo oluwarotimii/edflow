@@ -1,5 +1,8 @@
-module.exports = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true, // optional, enables SWC minification
-  // You can add more config options based on your needs here
-};
+  swcMinify: true,
+}
+
+module.exports = nextConfig
+
