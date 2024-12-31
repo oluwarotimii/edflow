@@ -302,7 +302,7 @@ export default function Home() {
         <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <h3 className="text-lg font-semibold mb-4">About Edflow</h3>
-            <p>Empowering schools with innovative management solutions since 2023.</p>
+            <p>Empowering schools with innovative management solutions since 2024.</p>
           </div>
           <div>
             <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
@@ -319,7 +319,7 @@ export default function Home() {
           </div>
         </div>
         <div className="container mx-auto mt-8 pt-8 border-t border-gray-700 text-center">
-          <p>&copy; 2023 Edflow. All rights reserved.</p>
+          <p>&copy; 2024 Edflow. All rights reserved.</p>
         </div>
       </footer>
     </div>
