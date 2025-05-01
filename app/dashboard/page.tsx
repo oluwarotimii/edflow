@@ -166,7 +166,7 @@ export default function DashboardPage() {
         <main className="container mx-auto py-6 px-4">
           <div className="flex flex-col md:flex-row items-center justify-between mb-6">
             <div className="mb-4 md:mb-0">
-              <h1 className="text-2xl md:text-3xl font-bold text-center md:text-left">{greeting}</h1>
+{/*               <h1 className="text-2xl md:text-3xl font-bold text-center md:text-left">{greeting}</h1> */}
               <p className="text-gray-600 text-center md:text-left">Welcome to your dashboard</p>
             </div>
             <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
