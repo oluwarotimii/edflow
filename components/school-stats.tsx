@@ -3,10 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 export function SchoolStats() {
   // Mock data - replace with actual data fetching logic
   const stats = [
-    { title: 'Total Students', value: 450 },
-    { title: 'Total Teachers', value: 30 },
-    { title: 'Average Attendance', value: '95%' },
-    { title: 'Upcoming Events', value: 5 },
+    { title: 'Total Students', value: 0 },
+    { title: 'Total Teachers', value: 0 },
+    { title: 'Average Attendance', value: '0%' },
+    { title: 'Upcoming Events', value: 0 },
   ]
 
   return (
